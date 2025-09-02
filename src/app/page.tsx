@@ -1,5 +1,5 @@
 import { catApiFetch, type CatImage } from "@/lib/catapi";
-import { Container, Typography } from "@mui/material";
+import { Container } from "@mui/material";
 import ClientGallery from "@/components/ClientGallery";
 
 async function getInitialImages(): Promise<CatImage[]> {
@@ -20,9 +20,6 @@ export default async function Home() {
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Typography variant="h4" component="h1" gutterBottom>
-        Give me a cat 🐈
-      </Typography>
       <ClientGallery initial={images} />
     </Container>
   );

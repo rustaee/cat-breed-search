@@ -1,4 +1,4 @@
-import { Card, CardContent, CardMedia, Typography, Box } from "@mui/material";
+import { Card, CardContent, CardMedia, Typography } from "@mui/material";
 import type { CatImage } from "@/lib/catapi";
 
 type Props = {
@@ -10,7 +10,15 @@ export default function CatCard({ image }: Props) {
   const subtitle = image.breeds?.[0]?.origin ? `Origin: ${image.breeds?.[0]?.origin}` : undefined;
 
   return (
-    <Card variant="outlined" sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
+    <Card
+      variant="outlined"
+      sx={{
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        '&:hover': { boxShadow: 6, transform: 'translateY(-2px)' },
+      }}
+    >
       <CardMedia
         component="img"
         height="240"
@@ -31,4 +39,3 @@ export default function CatCard({ image }: Props) {
     </Card>
   );
 }
-

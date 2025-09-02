@@ -1,9 +1,11 @@
 "use client";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { CatImage } from "@/lib/catapi";
-import { Box, Stack } from "@mui/material";
+import { Box, CircularProgress, Alert } from "@mui/material";
 import BreedAutocomplete from "@/components/BreedAutocomplete";
 import CatGrid from "@/components/CatGrid";
+import PageHeader from "@/components/PageHeader";
+import CatGridSkeleton from "@/components/CatGridSkeleton";
 
 type BreedOption = { id: string; name: string };
 
@@ -77,14 +79,29 @@ export default function ClientGallery({ initial }: Props) {
 
   return (
     <Box>
-      <Stack direction={{ xs: "column", sm: "row" }} gap={2} sx={{ mb: 3 }}>
-        <BreedAutocomplete value={breed} onChange={setBreed} />
-      </Stack>
-      <CatGrid images={images} />
-      <div ref={sentinelRef} />
-      {loading && <Box sx={{ textAlign: "center", py: 2 }}>Loading…</Box>}
-      {error && <Box sx={{ textAlign: "center", py: 2, color: "error.main" }}>{error}</Box>}
-      {isFetchingNext && !loading && <Box sx={{ textAlign: "center", py: 2 }}>Loading more…</Box>}
+      <PageHeader breed={breed} onBreedChange={setBreed} />
+      <Box sx={{ mt: 3 }}>
+        {loading && page === 0 ? (
+          <CatGridSkeleton />
+        ) : images.length > 0 ? (
+          <CatGrid images={images} />
+        ) : (
+          <Alert severity="info" sx={{ my: 2 }}>
+            No cats found. Try another breed or clear the filter.
+          </Alert>
+        )}
+        <Box sx={{ display: "flex", justifyContent: "center", py: 2 }} ref={sentinelRef} />
+        {isFetchingNext && !loading && (
+          <Box sx={{ display: "flex", justifyContent: "center", py: 2 }}>
+            <CircularProgress size={24} />
+          </Box>
+        )}
+        {error && (
+          <Alert severity="error" sx={{ my: 2 }}>
+            {error}
+          </Alert>
+        )}
+      </Box>
     </Box>
   );
 }
