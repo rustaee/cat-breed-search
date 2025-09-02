@@ -28,8 +28,12 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: text || "Cat API error" }, { status: 502 });
     }
     const data = await res.json();
-    const withBreeds = await ensureImageBreeds(data);
-    return NextResponse.json(withBreeds);
+    // Only enrich with per-image breed lookups when not filtering by a specific breed
+    if (!breedId) {
+      const withBreeds = await ensureImageBreeds(data);
+      return NextResponse.json(withBreeds);
+    }
+    return NextResponse.json(data);
   } catch (err: any) {
     return NextResponse.json({ error: err?.message || "Unexpected error" }, { status: 500 });
   }
