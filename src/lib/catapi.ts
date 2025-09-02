@@ -6,8 +6,8 @@ export function getCatApiKey(): string | undefined {
 
 export async function catApiFetch(input: string, init?: RequestInit) {
   const url = input.startsWith("http") ? input : `${CAT_API_BASE}${input}`;
-  const headers: HeadersInit = {
-    ...(init?.headers || {}),
+  const headers: Record<string, string> = {
+    ...(init?.headers as Record<string, string> || {}),
   };
   const apiKey = getCatApiKey();
   if (apiKey) headers["x-api-key"] = apiKey;

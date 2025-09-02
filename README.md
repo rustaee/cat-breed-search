@@ -51,6 +51,7 @@ npm run build && npm start
 - `src/app/api/images/route.ts` and `src/app/api/breeds/route.ts`: Proxy routes to The Cat API.
 - `src/lib/catapi.ts`: Fetch helper that adds the `x-api-key` header and uses `CAT_API_BASE`.
 - `src/theme.ts`: MUI theme (adjustable to match the Figma styling).
+ - `src/app/error.tsx` and `src/app/global-error.tsx`: Error boundaries with MUI-styled fallbacks. Use the reset button to retry.
 
 ## Notes & Decisions
 
