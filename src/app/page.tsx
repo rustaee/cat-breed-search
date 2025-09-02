@@ -1,6 +1,6 @@
 import { catApiFetch, type CatImage } from "@/lib/catapi";
 import { Container, Typography } from "@mui/material";
-import CatGrid from "@/components/CatGrid";
+import ClientGallery from "@/components/ClientGallery";
 
 async function getInitialImages(): Promise<CatImage[]> {
   const params = new URLSearchParams({
@@ -23,7 +23,7 @@ export default async function Home() {
       <Typography variant="h4" component="h1" gutterBottom>
         Give me a cat 🐈
       </Typography>
-      <CatGrid images={images} />
+      <ClientGallery initial={images} />
     </Container>
   );
 }
