@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { CatImage } from "@/lib/catapi";
 import { Box, Stack } from "@mui/material";
 import BreedAutocomplete from "@/components/BreedAutocomplete";
@@ -12,42 +12,68 @@ type Props = {
 };
 
 export default function ClientGallery({ initial }: Props) {
+  const LIMIT = 12;
   const [images, setImages] = useState<CatImage[]>(initial);
+  const [page, setPage] = useState(0);
+  const [hasMore, setHasMore] = useState(initial.length === LIMIT);
   const [breed, setBreed] = useState<BreedOption | null>(null);
   const [loading, setLoading] = useState(false);
+  const [isFetchingNext, setIsFetchingNext] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+  const didInitRef = useRef(false);
 
-  const fetchPage0 = useCallback(async (selected: BreedOption | null) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const params = new URLSearchParams({ limit: "12", page: "0" });
-      if (selected?.id) params.set("breed_id", selected.id);
-      const res = await fetch(`/api/images?${params.toString()}`);
-      if (!res.ok) throw new Error("Failed to fetch images");
-      const data: CatImage[] = await res.json();
-      setImages(data);
-    } catch (e: any) {
-      setError(e?.message || "Failed to load images");
-      setImages([]);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  // When breed changes, fetch first page filtered/unfiltered
-  useEffect(() => {
-    // Skip fetch on first mount if no breed selected since we already have initial
-    if (!breed) {
-      // If user cleared the breed, refresh to unfiltered page 0
-      if (images !== initial) {
-        fetchPage0(null);
+  const fetchPage = useCallback(
+    async (pageToFetch: number, selected: BreedOption | null, mode: "replace" | "append") => {
+      if (pageToFetch === 0 && mode === "replace") setLoading(true);
+      if (pageToFetch > 0 && mode === "append") setIsFetchingNext(true);
+      setError(null);
+      try {
+        const params = new URLSearchParams({ limit: String(LIMIT), page: String(pageToFetch) });
+        if (selected?.id) params.set("breed_id", selected.id);
+        const res = await fetch(`/api/images?${params.toString()}`);
+        if (!res.ok) throw new Error("Failed to fetch images");
+        const data: CatImage[] = await res.json();
+        setHasMore(data.length === LIMIT);
+        setImages((prev) => (mode === "append" ? [...prev, ...data] : data));
+        setPage(pageToFetch);
+      } catch (e: any) {
+        setError(e?.message || "Failed to load images");
+        if (mode === "replace") setImages([]);
+      } finally {
+        if (pageToFetch === 0 && mode === "replace") setLoading(false);
+        if (pageToFetch > 0 && mode === "append") setIsFetchingNext(false);
       }
-      return;
+    },
+    []
+  );
+
+  // Handle breed change (including clear) → reset list and page
+  useEffect(() => {
+    if (!didInitRef.current) {
+      didInitRef.current = true;
+      return; // keep SSR initial results on first render
     }
-    fetchPage0(breed);
+    fetchPage(0, breed, "replace");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [breed?.id]);
+
+  // IntersectionObserver to load next pages
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        if (entry.isIntersecting && hasMore && !isFetchingNext && !loading) {
+          fetchPage(page + 1, breed, "append");
+        }
+      },
+      { rootMargin: "200px 0px" }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [breed, page, hasMore, isFetchingNext, loading, fetchPage]);
 
   return (
     <Box>
@@ -55,9 +81,10 @@ export default function ClientGallery({ initial }: Props) {
         <BreedAutocomplete value={breed} onChange={setBreed} />
       </Stack>
       <CatGrid images={images} />
+      <div ref={sentinelRef} />
       {loading && <Box sx={{ textAlign: "center", py: 2 }}>Loading…</Box>}
       {error && <Box sx={{ textAlign: "center", py: 2, color: "error.main" }}>{error}</Box>}
+      {isFetchingNext && !loading && <Box sx={{ textAlign: "center", py: 2 }}>Loading more…</Box>}
     </Box>
   );
 }
-
