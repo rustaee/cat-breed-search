@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
     params.set("limit", limit);
     params.set("page", page);
     params.set("order", "Desc");
-    params.set("include_breeds", "true");
+    params.set("attach_breeds", "1");
     if (breedId) {
       params.set("breed_ids", breedId);
     } else {

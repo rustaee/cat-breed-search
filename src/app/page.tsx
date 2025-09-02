@@ -6,7 +6,7 @@ async function getInitialImages(): Promise<CatImage[]> {
   const params = new URLSearchParams({
     limit: "12",
     order: "Desc",
-    include_breeds: "true",
+    attach_breeds: "1",
     has_breeds: "1",
     page: "0",
   });
