@@ -28,6 +28,7 @@ npm install
 - Create a `.env.local` file at the project root (or copy `.env.example`):
 ```
 CAT_API_KEY=YOUR_CAT_API_KEY
+CAT_API_BASE=https://api.thecatapi.com/v1
 ```
 
 4) Run locally
@@ -48,7 +49,7 @@ npm run build && npm start
 - `src/components/BreedAutocomplete.tsx`: MUI autocomplete wired to `/api/breeds`.
 - `src/components/CatGrid.tsx` and `src/components/CatCard.tsx`: Responsive grid and image cards.
 - `src/app/api/images/route.ts` and `src/app/api/breeds/route.ts`: Proxy routes to The Cat API.
-- `src/lib/catapi.ts`: Fetch helper that adds the `x-api-key` header.
+- `src/lib/catapi.ts`: Fetch helper that adds the `x-api-key` header and uses `CAT_API_BASE`.
 - `src/theme.ts`: MUI theme (adjustable to match the Figma styling).
 
 ## Notes & Decisions

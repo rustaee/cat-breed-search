@@ -1,4 +1,4 @@
-const CAT_API_BASE = "https://api.thecatapi.com/v1";
+const CAT_API_BASE = process.env.CAT_API_BASE || "https://api.thecatapi.com/v1";
 
 export function getCatApiKey(): string | undefined {
   return process.env.CAT_API_KEY;
