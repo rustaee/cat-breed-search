@@ -16,7 +16,11 @@ export default function CatCard({ image }: Props) {
         height: "100%",
         display: "flex",
         flexDirection: "column",
-        '&:hover': { boxShadow: 6, transform: 'translateY(-2px)' },
+        borderColor: "divider",
+        borderWidth: 1,
+        borderStyle: "solid",
+        transition: "box-shadow 200ms ease, transform 200ms ease, border-color 200ms ease",
+        '&:hover': { boxShadow: 6, transform: 'translateY(-2px)', borderColor: 'primary.main' },
       }}
     >
       <CardMedia
