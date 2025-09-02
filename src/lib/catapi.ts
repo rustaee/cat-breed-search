@@ -1,9 +1,7 @@
 const CAT_API_BASE = "https://api.thecatapi.com/v1";
-// Fallback to provided API key if env is not set (for convenient local dev)
-const DEFAULT_API_KEY = "live_10pUS3xlWhsefPS3QltaZZFTD8BR2ieBXUAHvnIfyHVDA2L46heX1QLgAwX1xTm";
 
 export function getCatApiKey(): string | undefined {
-  return process.env.CAT_API_KEY || DEFAULT_API_KEY;
+  return process.env.CAT_API_KEY;
 }
 
 export async function catApiFetch(input: string, init?: RequestInit) {

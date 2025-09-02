@@ -25,11 +25,10 @@ npm install
 ```
 
 3) Configure environment
-- Create a `.env.local` file at the project root:
+- Create a `.env.local` file at the project root (or copy `.env.example`):
 ```
-CAT_API_KEY=live_10pUS3xlWhsefPS3QltaZZFTD8BR2ieBXUAHvnIfyHVDA2L46heX1QLgAwX1xTm
+CAT_API_KEY=YOUR_CAT_API_KEY
 ```
-- Note: The app also falls back to this key if the env var is not set (see `src/lib/catapi.ts`). For production, set `CAT_API_KEY` explicitly.
 
 4) Run locally
 ```
