@@ -1,7 +1,7 @@
 "use client";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { CatImage } from "@/lib/catapi";
-import { Box, CircularProgress, Alert } from "@mui/material";
+import { Box, CircularProgress, Alert, Button } from "@mui/material";
 import BreedAutocomplete from "@/components/BreedAutocomplete";
 import CatGrid from "@/components/CatGrid";
 import PageHeader from "@/components/PageHeader";
@@ -17,7 +17,7 @@ export default function ClientGallery({ initial }: Props) {
   const LIMIT = 12;
   const [images, setImages] = useState<CatImage[]>(initial);
   const [page, setPage] = useState(0);
-  const [hasMore, setHasMore] = useState(initial.length === LIMIT);
+  const [hasMore, setHasMore] = useState(initial.length >= LIMIT);
   const [breed, setBreed] = useState<BreedOption | null>(null);
   const [loading, setLoading] = useState(false);
   const [isFetchingNext, setIsFetchingNext] = useState(false);
@@ -71,7 +71,7 @@ export default function ClientGallery({ initial }: Props) {
           fetchPage(page + 1, breed, "append");
         }
       },
-      { rootMargin: "200px 0px" }
+      { rootMargin: "400px 0px", threshold: 0.01 }
     );
     observer.observe(el);
     return () => observer.disconnect();
@@ -90,10 +90,15 @@ export default function ClientGallery({ initial }: Props) {
             No cats found. Try another breed or clear the filter.
           </Alert>
         )}
-        <Box sx={{ display: "flex", justifyContent: "center", py: 2 }} ref={sentinelRef} />
+        <Box sx={{ display: "flex", justifyContent: "center", py: 2, minHeight: 1 }} ref={sentinelRef} />
         {isFetchingNext && !loading && (
           <Box sx={{ display: "flex", justifyContent: "center", py: 2 }}>
             <CircularProgress size={24} />
+          </Box>
+        )}
+        {hasMore && !isFetchingNext && !loading && (
+          <Box sx={{ display: "flex", justifyContent: "center", py: 2 }}>
+            <Button variant="outlined" onClick={() => fetchPage(page + 1, breed, "append")}>Load more</Button>
           </Box>
         )}
         {error && (
