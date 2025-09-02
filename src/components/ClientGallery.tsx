@@ -23,6 +23,7 @@ export default function ClientGallery({ initial }: Props) {
   const [isFetchingNext, setIsFetchingNext] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
+  const seenIdsRef = useRef<Set<string>>(new Set(initial.map((it) => it.id)));
   const didInitRef = useRef(false);
   const stateRef = useRef({ hasMore, isFetchingNext, loading, page, breed });
 
@@ -42,10 +43,19 @@ export default function ClientGallery({ initial }: Props) {
         const res = await fetch(`/api/images?${params.toString()}`);
         if (!res.ok) throw new Error("Failed to fetch images");
         const data: CatImage[] = await res.json();
-        // Cat API can return fewer than LIMIT even when more results exist.
+        // Deduplicate by id because the API may repeat results across pages
+        const unique =
+          mode === "replace"
+            ? data // on replace, start fresh — don't filter against previous set
+            : data.filter((img) => !seenIdsRef.current.has(img.id));
+        if (mode === "replace") {
+          seenIdsRef.current = new Set(unique.map((i) => i.id));
+        } else {
+          unique.forEach((i) => seenIdsRef.current.add(i.id));
+        }
         // Keep allowing more loads as long as we still get some results.
         setHasMore(data.length > 0);
-        setImages((prev) => (mode === "append" ? [...prev, ...data] : data));
+        setImages((prev) => (mode === "append" ? [...prev, ...unique] : unique));
         setPage(pageToFetch);
       } catch (e: any) {
         setError(e?.message || "Failed to load images");
