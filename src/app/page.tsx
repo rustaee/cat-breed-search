@@ -1,4 +1,4 @@
-import { catApiFetch, type CatImage } from "@/lib/catapi";
+import { catApiFetch, ensureImageBreeds, type CatImage } from "@/lib/catapi";
 import { Container } from "@mui/material";
 import ClientGallery from "@/components/ClientGallery";
 
@@ -12,7 +12,8 @@ async function getInitialImages(): Promise<CatImage[]> {
   });
   const res = await catApiFetch(`/images/search?${params.toString()}`);
   if (!res.ok) return [];
-  return res.json();
+  const data: CatImage[] = await res.json();
+  return ensureImageBreeds(data);
 }
 
 export default async function Home() {

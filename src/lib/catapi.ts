@@ -29,3 +29,29 @@ export type CatImage = {
   height?: number;
   breeds?: CatBreed[];
 };
+
+// Ensure each image has breeds by fetching image details when missing.
+export async function ensureImageBreeds(images: CatImage[]): Promise<CatImage[]> {
+  const missing = images.filter((img) => !img.breeds || img.breeds.length === 0);
+  if (missing.length === 0) return images;
+
+  const results = await Promise.all(
+    missing.map(async (img) => {
+      try {
+        const res = await catApiFetch(`/images/${img.id}`);
+        if (!res.ok) return null;
+        const detail = (await res.json()) as CatImage;
+        return detail?.breeds?.length ? { id: img.id, breeds: detail.breeds } : null;
+      } catch {
+        return null;
+      }
+    })
+  );
+
+  const byId = new Map(results.filter(Boolean).map((d: any) => [d.id, d.breeds]));
+  return images.map((img) => {
+    if (img.breeds && img.breeds.length) return img;
+    const breeds = byId.get(img.id);
+    return breeds ? { ...img, breeds } : img;
+  });
+}

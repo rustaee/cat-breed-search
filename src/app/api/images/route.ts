@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { catApiFetch } from "@/lib/catapi";
+import { catApiFetch, ensureImageBreeds } from "@/lib/catapi";
 
 export const dynamic = "force-dynamic";
 
@@ -28,7 +28,8 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: text || "Cat API error" }, { status: 502 });
     }
     const data = await res.json();
-    return NextResponse.json(data);
+    const withBreeds = await ensureImageBreeds(data);
+    return NextResponse.json(withBreeds);
   } catch (err: any) {
     return NextResponse.json({ error: err?.message || "Unexpected error" }, { status: 500 });
   }
