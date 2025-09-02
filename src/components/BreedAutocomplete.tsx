@@ -2,7 +2,15 @@
 import { useEffect, useMemo, useState } from "react";
 import { Autocomplete, CircularProgress, TextField } from "@mui/material";
 
-type BreedOption = { id: string; name: string };
+type BreedOption = {
+  id: string;
+  name: string;
+  origin?: string;
+  temperament?: string;
+  description?: string;
+  wikipedia_url?: string;
+  life_span?: string;
+};
 
 type Props = {
   value: BreedOption | null;
@@ -76,4 +84,3 @@ function useDebounce<T>(value: T, delay = 300): T {
   }, [value, delay]);
   return debounced;
 }
-

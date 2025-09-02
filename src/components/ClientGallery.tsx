@@ -6,8 +6,17 @@ import BreedAutocomplete from "@/components/BreedAutocomplete";
 import CatGrid from "@/components/CatGrid";
 import PageHeader from "@/components/PageHeader";
 import CatGridSkeleton from "@/components/CatGridSkeleton";
+import BreedDetails from "@/components/BreedDetails";
 
-type BreedOption = { id: string; name: string };
+type BreedOption = {
+  id: string;
+  name: string;
+  origin?: string;
+  temperament?: string;
+  description?: string;
+  wikipedia_url?: string;
+  life_span?: string;
+};
 
 type Props = {
   initial: CatImage[];
@@ -104,7 +113,10 @@ export default function ClientGallery({ initial }: Props) {
         {loading && page === 0 ? (
           <CatGridSkeleton />
         ) : images.length > 0 ? (
-          <CatGrid images={images} />
+          <>
+            {breed && <BreedDetails breed={breed} />}
+            <CatGrid images={images} showMeta={!breed} />
+          </>
         ) : (
           <Alert severity="info" sx={{ my: 2 }}>
             No cats found. Try another breed or clear the filter.

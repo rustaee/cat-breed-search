@@ -2,7 +2,15 @@
 import { AppBar, Container, Toolbar, Typography, Box } from "@mui/material";
 import BreedAutocomplete from "@/components/BreedAutocomplete";
 
-type BreedOption = { id: string; name: string };
+type BreedOption = {
+  id: string;
+  name: string;
+  origin?: string;
+  temperament?: string;
+  description?: string;
+  wikipedia_url?: string;
+  life_span?: string;
+};
 
 type Props = {
   breed: BreedOption | null;
@@ -25,4 +33,3 @@ export default function PageHeader({ breed, onBreedChange }: Props) {
     </AppBar>
   );
 }
-

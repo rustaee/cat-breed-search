@@ -20,13 +20,20 @@ export async function GET(req: NextRequest) {
     }
     const data = await res.json();
 
-    // Normalize to id + name minimal payload for autocomplete
+    // Normalize to a richer payload for details section
     const items = Array.isArray(data)
-      ? data.map((b: any) => ({ id: b.id, name: b.name }))
+      ? data.map((b: any) => ({
+          id: b.id,
+          name: b.name,
+          origin: b.origin,
+          temperament: b.temperament,
+          description: b.description,
+          wikipedia_url: b.wikipedia_url,
+          life_span: b.life_span,
+        }))
       : [];
     return NextResponse.json(items);
   } catch (err: any) {
     return NextResponse.json({ error: err?.message || "Unexpected error" }, { status: 500 });
   }
 }
-
