@@ -53,8 +53,8 @@ export default function ClientGallery({ initial }: Props) {
         } else {
           unique.forEach((i) => seenIdsRef.current.add(i.id));
         }
-        // Keep allowing more loads as long as we still get some results.
-        setHasMore(data.length > 0);
+        // Keep allowing more loads only if we actually received new, unique items.
+        setHasMore(unique.length > 0);
         setImages((prev) => (mode === "append" ? [...prev, ...unique] : unique));
         setPage(pageToFetch);
       } catch (e: any) {
