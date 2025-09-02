@@ -5,9 +5,14 @@ import { createTheme } from "@mui/material/styles";
 export const theme = createTheme({
   palette: {
     mode: "light",
-    primary: { main: "#5E35B1" }, // Deep purple
-    secondary: { main: "#26A69A" }, // Teal
-    background: { default: "#fafafa", paper: "#ffffff" },
+    primary: {
+      main: "#00BCD4",
+      dark: "#006064",
+      light: "#00BCD4",
+      contrastText: "#ffffff",
+    },
+    background: { default: "#ffffff", paper: "#ffffff" },
+    divider: "#E0E0E0",
   },
   shape: { borderRadius: 12 },
   typography: {
@@ -20,14 +25,18 @@ export const theme = createTheme({
         root: {
           backgroundColor: "#ffffff",
           color: "#111827",
-          borderBottom: "1px solid rgba(0,0,0,0.06)",
+          borderBottom: "1px solid #E0E0E0",
         },
       },
       defaultProps: { elevation: 0, color: "default" },
     },
     MuiCard: {
       styleOverrides: {
-        root: { transition: "box-shadow 200ms ease, transform 200ms ease" },
+        root: {
+          backgroundColor: "#ECEFF1",
+          border: "1px solid #E0E0E0",
+          transition: "box-shadow 200ms ease, transform 200ms ease",
+        },
       },
     },
   },
