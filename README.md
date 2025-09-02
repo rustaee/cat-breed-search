@@ -1,36 +1,71 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## Give me a cat 🐈 — Cat Breeds Gallery
 
-## Getting Started
+A Next.js + Material UI application that interacts with The Cat API to display a responsive grid of cat images. It supports server-side rendering for the initial load, breed search with autocomplete, and infinite scrolling to fetch more images as you scroll.
 
-First, run the development server:
+### Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- Server-side rendered initial page with cat images.
+- Responsive MUI grid and cards that adapt to screen size.
+- Breed search autocomplete; selecting a breed filters the grid.
+- Infinite scrolling with IntersectionObserver to load additional pages.
+- API proxy routes under `/api` to keep the API key server-side.
+
+### Tech
+
+- Next.js App Router (TypeScript), Material UI, The Cat API.
+
+## Setup
+
+1) Prerequisites
+- Node.js 18+ and npm.
+
+2) Install dependencies
+```
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+3) Configure environment
+- Create a `.env.local` file at the project root:
+```
+CAT_API_KEY=live_10pUS3xlWhsefPS3QltaZZFTD8BR2ieBXUAHvnIfyHVDA2L46heX1QLgAwX1xTm
+```
+- Note: The app also falls back to this key if the env var is not set (see `src/lib/catapi.ts`). For production, set `CAT_API_KEY` explicitly.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+4) Run locally
+```
+npm run dev
+```
+Open http://localhost:3000
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+5) Build
+```
+npm run build && npm start
+```
 
-## Learn More
+## Project Structure
 
-To learn more about Next.js, take a look at the following resources:
+- `src/app/page.tsx`: SSR page that fetches initial images and renders the gallery.
+- `src/components/ClientGallery.tsx`: Client wrapper implementing breed filter + infinite scroll.
+- `src/components/BreedAutocomplete.tsx`: MUI autocomplete wired to `/api/breeds`.
+- `src/components/CatGrid.tsx` and `src/components/CatCard.tsx`: Responsive grid and image cards.
+- `src/app/api/images/route.ts` and `src/app/api/breeds/route.ts`: Proxy routes to The Cat API.
+- `src/lib/catapi.ts`: Fetch helper that adds the `x-api-key` header.
+- `src/theme.ts`: MUI theme (adjustable to match the Figma styling).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Notes & Decisions
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Initial render is server-side: `page.tsx` calls The Cat API from the server to deliver the first image grid.
+- Infinite scrolling: Implemented via `IntersectionObserver` with a bottom sentinel and paginated `/api/images` calls.
+- Breed filtering: Selecting a breed resets pagination and refetches page 0.
+- Images: Using native `img` for simplicity and broad remote host support. If switching to `next/image`, configure `images.remotePatterns` in `next.config.ts`.
+- Styling: Base MUI theme provided in `src/theme.ts`; tweak colors/typography to align with the Figma file as needed.
 
-## Deploy on Vercel
+## Scripts
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- `npm run dev`: Start dev server.
+- `npm run build`: Build for production.
+- `npm start`: Start production server.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## License / Attribution
+
+- Cat images and breed data come from [The Cat API](https://thecatapi.com/).
