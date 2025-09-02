@@ -24,6 +24,12 @@ export default function ClientGallery({ initial }: Props) {
   const [error, setError] = useState<string | null>(null);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
   const didInitRef = useRef(false);
+  const stateRef = useRef({ hasMore, isFetchingNext, loading, page, breed });
+
+  // Keep an up-to-date snapshot for the IntersectionObserver callback to avoid stale closures
+  useEffect(() => {
+    stateRef.current = { hasMore, isFetchingNext, loading, page, breed };
+  }, [hasMore, isFetchingNext, loading, page, breed]);
 
   const fetchPage = useCallback(
     async (pageToFetch: number, selected: BreedOption | null, mode: "replace" | "append") => {
@@ -69,8 +75,9 @@ export default function ClientGallery({ initial }: Props) {
     const observer = new IntersectionObserver(
       (entries) => {
         const entry = entries[0];
-        if (entry.isIntersecting && hasMore && !isFetchingNext && !loading) {
-          fetchPage(page + 1, breed, "append");
+        const { hasMore: hm, isFetchingNext: ifn, loading: ld, page: pg, breed: br } = stateRef.current;
+        if (entry.isIntersecting && hm && !ifn && !ld) {
+          fetchPage(pg + 1, br, "append");
         }
       },
       { rootMargin: "400px 0px", threshold: 0.01 }
