@@ -15,9 +15,12 @@ export async function GET(req: NextRequest) {
     params.set("page", page);
     params.set("order", "Desc");
     params.set("include_breeds", "true");
-    // We want images with breed data when not filtering by a breed
-    params.set("has_breeds", "1");
-    if (breedId) params.set("breed_ids", breedId);
+    if (breedId) {
+      params.set("breed_ids", breedId);
+    } else {
+      // Prefer images that include breed info for the general feed
+      params.set("has_breeds", "1");
+    }
 
     const res = await catApiFetch(`/images/search?${params.toString()}`);
     if (!res.ok) {
@@ -30,4 +33,3 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: err?.message || "Unexpected error" }, { status: 500 });
   }
 }
-

@@ -17,7 +17,7 @@ export default function ClientGallery({ initial }: Props) {
   const LIMIT = 12;
   const [images, setImages] = useState<CatImage[]>(initial);
   const [page, setPage] = useState(0);
-  const [hasMore, setHasMore] = useState(initial.length >= LIMIT);
+  const [hasMore, setHasMore] = useState(initial.length > 0);
   const [breed, setBreed] = useState<BreedOption | null>(null);
   const [loading, setLoading] = useState(false);
   const [isFetchingNext, setIsFetchingNext] = useState(false);
@@ -36,7 +36,9 @@ export default function ClientGallery({ initial }: Props) {
         const res = await fetch(`/api/images?${params.toString()}`);
         if (!res.ok) throw new Error("Failed to fetch images");
         const data: CatImage[] = await res.json();
-        setHasMore(data.length === LIMIT);
+        // Cat API can return fewer than LIMIT even when more results exist.
+        // Keep allowing more loads as long as we still get some results.
+        setHasMore(data.length > 0);
         setImages((prev) => (mode === "append" ? [...prev, ...data] : data));
         setPage(pageToFetch);
       } catch (e: any) {
