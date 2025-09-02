@@ -80,6 +80,7 @@ export default function ClientGallery({ initial }: Props) {
 
   // IntersectionObserver to load next pages
   useEffect(() => {
+    if (!hasMore) return; // stop observing when we've reached the end
     const el = sentinelRef.current;
     if (!el) return;
     const observer = new IntersectionObserver(
@@ -118,6 +119,11 @@ export default function ClientGallery({ initial }: Props) {
         {hasMore && !isFetchingNext && !loading && (
           <Box sx={{ display: "flex", justifyContent: "center", py: 2 }}>
             <Button variant="outlined" onClick={() => fetchPage(page + 1, breed, "append")}>Load more</Button>
+          </Box>
+        )}
+        {!hasMore && images.length > 0 && !loading && (
+          <Box sx={{ display: "flex", justifyContent: "center", py: 2, color: "text.secondary" }}>
+            You’ve reached the end.
           </Box>
         )}
         {error && (
