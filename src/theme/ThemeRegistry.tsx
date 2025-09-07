@@ -7,11 +7,14 @@ import { ThemeProvider, CssBaseline } from "@mui/material";
 import { theme } from "@/theme";
 
 export default function ThemeRegistry({ children }: { children: React.ReactNode }) {
+  // Create a cache for Emotion styles.
+  // This cache will help with server-side rendering and style injection.
   const [{ cache, flush }] = React.useState(() => {
     const cache = createCache({ key: "mui", prepend: true });
     cache.compat = true;
     const prevInsert = cache.insert;
     let inserted: string[] = [];
+    // Keep track of all inserted styles.
     cache.insert = (...args: any) => {
       const serialized = args[1];
       if (cache.inserted[serialized.name] === undefined) {
@@ -19,6 +22,8 @@ export default function ThemeRegistry({ children }: { children: React.ReactNode 
       }
       return (prevInsert as any)(...args);
     };
+
+    // Flush the cache and return the inserted styles.
     const flush = () => {
       const content = inserted.map((name) => (cache.inserted as any)[name]).join("");
       inserted = [];

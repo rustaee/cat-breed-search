@@ -32,9 +32,11 @@ export type CatImage = {
 
 // Ensure each image has breeds by fetching image details when missing.
 export async function ensureImageBreeds(images: CatImage[]): Promise<CatImage[]> {
+  // Find images that are missing breed information
   const missing = images.filter((img) => !img.breeds || img.breeds.length === 0);
   if (missing.length === 0) return images;
 
+  // Fetch missing breed information in parallel
   const results = await Promise.all(
     missing.map(async (img) => {
       try {
@@ -48,6 +50,7 @@ export async function ensureImageBreeds(images: CatImage[]): Promise<CatImage[]>
     })
   );
 
+  // Map results back to original images.
   const byId = new Map(results.filter(Boolean).map((d: any) => [d.id, d.breeds]));
   return images.map((img) => {
     if (img.breeds && img.breeds.length) return img;

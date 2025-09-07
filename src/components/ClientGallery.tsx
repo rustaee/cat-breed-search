@@ -1,8 +1,7 @@
 "use client";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { CatImage } from "@/lib/catapi";
 import { Box, CircularProgress, Alert, Button } from "@mui/material";
-import BreedAutocomplete from "@/components/BreedAutocomplete";
 import CatGrid from "@/components/CatGrid";
 import PageHeader from "@/components/PageHeader";
 import CatGridSkeleton from "@/components/CatGridSkeleton";
@@ -32,10 +31,10 @@ export default function ClientGallery({ initial }: Props) {
   const [isFetchingNext, setIsFetchingNext] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
-  const seenIdsRef = useRef<Set<string>>(new Set(initial.map((it) => it.id)));
-  const didInitRef = useRef(false);
-  const stateRef = useRef({ hasMore, isFetchingNext, loading, page, breed });
-
+  const seenIdsRef = useRef<Set<string>>(new Set(initial.map((it) => it.id))); // Keep track of all seen image IDs to avoid duplicates
+  const didInitRef = useRef(false); // tracks first client effect to avoid refetching immediately after hydration 
+  const stateRef = useRef({ hasMore, isFetchingNext, loading, page, breed }); 
+  
   // Keep an up-to-date snapshot for the IntersectionObserver callback to avoid stale closures
   useEffect(() => {
     stateRef.current = { hasMore, isFetchingNext, loading, page, breed };
@@ -84,7 +83,6 @@ export default function ClientGallery({ initial }: Props) {
       return; // keep SSR initial results on first render
     }
     fetchPage(0, breed, "replace");
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [breed?.id]);
 
   // IntersectionObserver to load next pages
@@ -106,40 +104,59 @@ export default function ClientGallery({ initial }: Props) {
     return () => observer.disconnect();
   }, [breed, page, hasMore, isFetchingNext, loading, fetchPage]);
 
+  const liveRegionMessage = (() => {
+    if (error) return `Error: ${error}`;
+    if (loading && page === 0) return "Loading cat images";
+    if (isFetchingNext) return "Loading more cat images";
+    if (images.length === 0 && !loading) return "No cat images found";
+    return `Showing ${images.length} cat image${images.length === 1 ? "" : "s"}${breed ? ` for breed ${breed.name}` : ""}`;
+  })();
+
   return (
-    <Box>
+    <Box aria-live="off">{/* container; explicit off keeps announcements limited to dedicated region */}
       <PageHeader breed={breed} onBreedChange={setBreed} />
+      {/* Dedicated polite live region for screen readers (visually hidden) */}
+      <Box className="visually-hidden" aria-live="polite" aria-atomic="true">{liveRegionMessage}</Box>
       <Box sx={{ mt: 3 }}>
         {loading && page === 0 ? (
-          <CatGridSkeleton />
+          <CatGridSkeleton ariaLabel="Loading initial cat images" />
         ) : images.length > 0 ? (
           <>
             {breed && <BreedDetails breed={breed} />}
             <CatGrid images={images} showMeta={!breed} />
+            <Box className="visually-hidden" aria-live="polite" aria-atomic="true">
+              {`Total ${images.length} images loaded`}
+            </Box>
           </>
         ) : (
-          <Alert severity="info" sx={{ my: 2 }}>
+          <Alert severity="info" sx={{ my: 2 }} role="status">
             No cats found. Try another breed or clear the filter.
           </Alert>
         )}
-        <Box sx={{ display: "flex", justifyContent: "center", py: 2, minHeight: 1 }} ref={sentinelRef} />
+        <Box sx={{ display: "flex", justifyContent: "center", py: 2, minHeight: 1 }} ref={sentinelRef} aria-hidden="true" />
         {isFetchingNext && !loading && (
-          <Box sx={{ display: "flex", justifyContent: "center", py: 2 }}>
-            <CircularProgress size={24} />
+          <Box sx={{ display: "flex", justifyContent: "center", py: 2 }} role="status" aria-live="polite">
+            <CircularProgress size={24} aria-label="Loading more cat images" />
           </Box>
         )}
         {hasMore && !isFetchingNext && !loading && (
           <Box sx={{ display: "flex", justifyContent: "center", py: 2 }}>
-            <Button variant="outlined" onClick={() => fetchPage(page + 1, breed, "append")}>Load more</Button>
+            <Button
+              variant="outlined"
+              onClick={() => fetchPage(page + 1, breed, "append")}
+              aria-label="Load more cat images"
+            >
+              Load more
+            </Button>
           </Box>
         )}
         {!hasMore && images.length > 0 && !loading && (
-          <Box sx={{ display: "flex", justifyContent: "center", py: 2, color: "text.secondary" }}>
+          <Box sx={{ display: "flex", justifyContent: "center", py: 2, color: "text.secondary" }} role="status" aria-live="polite">
             You’ve reached the end.
           </Box>
         )}
         {error && (
-          <Alert severity="error" sx={{ my: 2 }}>
+          <Alert severity="error" sx={{ my: 2 }} role="alert">
             {error}
           </Alert>
         )}

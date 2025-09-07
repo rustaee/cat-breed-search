@@ -20,8 +20,10 @@ export default async function Home() {
   const images = await getInitialImages();
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
-      <ClientGallery initial={images} />
-    </Container>
+    <main id="main">
+      <Container maxWidth="lg" sx={{ py: 4 }}>
+        <ClientGallery initial={images} />
+      </Container>
+    </main>
   );
 }
