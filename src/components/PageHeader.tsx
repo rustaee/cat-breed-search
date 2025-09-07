@@ -1,5 +1,6 @@
 "use client";
 import { AppBar, Container, Toolbar, Typography, Box } from "@mui/material";
+import { useTheme, alpha } from "@mui/material/styles";
 import BreedAutocomplete from "@/components/BreedAutocomplete";
 
 type BreedOption = {
@@ -19,7 +20,7 @@ type Props = {
 
 export default function PageHeader({ breed, onBreedChange }: Props) {
   return (
-    <AppBar position="sticky">
+  <AppBar position="sticky" elevation={0} sx={{ backgroundColor: 'rgba(255, 255, 255, 0.5)', backdropFilter: "saturate(180%) blur(12px)" }}>
       <Container maxWidth="lg">
         <Toolbar disableGutters sx={{ py: 1.5, gap: 2, flexWrap: { xs: "wrap", sm: "nowrap" } }}>
           <Typography variant="h5" component="h1" sx={{ flexGrow: { xs: 1, sm: 0 }, fontWeight: 700 }}>

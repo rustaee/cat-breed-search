@@ -119,7 +119,7 @@ export default function ClientGallery({ initial }: Props) {
       <Box className="visually-hidden" aria-live="polite" aria-atomic="true">{liveRegionMessage}</Box>
       <Box sx={{ mt: 3 }}>
         {loading && page === 0 ? (
-          <CatGridSkeleton ariaLabel="Loading initial cat images" />
+          <CatGridSkeleton />
         ) : images.length > 0 ? (
           <>
             {breed && <BreedDetails breed={breed} />}
