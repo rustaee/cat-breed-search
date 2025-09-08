@@ -1,6 +1,7 @@
 import { catApiFetch, ensureImageBreeds, type CatImage } from "@/lib/catapi";
 import { Container } from "@mui/material";
 import ClientGallery from "@/components/ClientGallery";
+import ClientErrorBoundary from "@/components/ClientErrorBoundary";
 
 async function getInitialImages(): Promise<CatImage[]> {
   const params = new URLSearchParams({
@@ -22,7 +23,9 @@ export default async function Home() {
   return (
     <main id="main">
       <Container maxWidth="lg" sx={{ py: 4 }}>
-        <ClientGallery initial={images} />
+        <ClientErrorBoundary>
+          <ClientGallery initial={images} />
+        </ClientErrorBoundary>
       </Container>
     </main>
   );

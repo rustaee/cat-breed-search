@@ -52,6 +52,10 @@ npm run build && npm start
 - `src/lib/catapi.ts`: Fetch helper that adds the `x-api-key` header and uses `CAT_API_BASE`.
 - `src/theme.ts`: MUI theme (adjustable to match the Figma styling).
  - `src/app/error.tsx` and `src/app/global-error.tsx`: Error boundaries with MUI-styled fallbacks. Use the reset button to retry.
+ - `src/app/error.tsx` and `src/app/global-error.tsx`: Error boundaries with MUI-styled fallbacks. Use the reset button to retry.
+ - `src/app/loading.tsx`: Route-level suspense fallback streaming a skeleton while initial data resolves.
+ - `src/components/ClientErrorBoundary.tsx`: Client-side error boundary catching runtime interaction errors not handled by route boundaries.
+ - `src/components/AsyncBreedDetails.tsx`: Example async server component suitable for a nested <Suspense> boundary.
 
 ## Notes & Decisions
 
