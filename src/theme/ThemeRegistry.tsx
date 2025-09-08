@@ -4,7 +4,14 @@ import { useServerInsertedHTML } from "next/navigation";
 import createCache from "@emotion/cache";
 import { CacheProvider } from "@emotion/react";
 import { ThemeProvider, CssBaseline } from "@mui/material";
-import { theme } from "@/theme";
+import { createAppTheme } from "@/theme";
+import type { PaletteMode } from "@mui/material";
+
+export const ColorModeContext = React.createContext<{ mode: PaletteMode; toggle: () => void }>({
+  mode: "light",
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  toggle: () => {},
+});
 
 export default function ThemeRegistry({ children }: { children: React.ReactNode }) {
   // Create a cache for Emotion styles.
@@ -39,12 +46,26 @@ export default function ThemeRegistry({ children }: { children: React.ReactNode 
     />
   ));
 
+  const [mode, setMode] = React.useState<PaletteMode>("dark");
+  const muiTheme = React.useMemo(() => createAppTheme(mode), [mode]);
+  const ctx = React.useMemo(() => ({ mode, toggle: () => setMode(m => (m === "light" ? "dark" : "light")) }), [mode]);
+
+  // Ensure body background updates even if previous injected style tags linger (SSR + streaming)
+  React.useEffect(() => {
+    if (typeof document !== "undefined") {
+      document.body.style.backgroundColor = muiTheme.palette.background.default;
+      document.body.style.color = muiTheme.palette.text.primary;
+    }
+  }, [muiTheme]);
+
   return (
     <CacheProvider value={cache}>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        {children}
-      </ThemeProvider>
+      <ColorModeContext.Provider value={ctx}>
+        <ThemeProvider theme={muiTheme}>
+          <CssBaseline />
+          {children}
+        </ThemeProvider>
+      </ColorModeContext.Provider>
     </CacheProvider>
   );
 }
